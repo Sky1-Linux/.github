@@ -10,8 +10,11 @@ wget -qO- https://sky1-linux.github.io/apt/key.gpg | sudo tee /usr/share/keyring
 echo "deb [signed-by=/usr/share/keyrings/sky1-linux.asc] https://sky1-linux.github.io/apt sid main non-free-firmware" | sudo tee /etc/apt/sources.list.d/sky1-linux.list
 sudo apt update
 
-# Install kernel and firmware
-sudo apt install linux-image-6.18-sky1 linux-headers-6.18-sky1 sky1-firmware
+# Install everything for desktop use
+sudo apt install sky1-desktop
+
+# Or minimal (kernel + firmware + 5GbE)
+sudo apt install sky1-minimal
 ```
 
 ## Repositories
