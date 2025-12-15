@@ -1,6 +1,50 @@
 # Sky1 Linux
 
-Linux distribution for CIX Sky1 SoC (Radxa Orion O6) based on Debian Sid with mainline kernel support.
+**Making the Radxa Orion O6 actually usable on mainline Linux.**
+
+## The Problem
+
+The Radxa Orion O6 packs impressive hardware—a 12-core ARM CPU, Mali-G720 GPU, 30 TOPS NPU, hardware video codec—but mainline Linux doesn't support most of it. CIX Technology is upstreaming basic SoC support (pinctrl, mailbox, PCIe), but critical subsystems have no upstream path:
+
+| Subsystem | Mainline Status | Lines of Code Missing |
+|-----------|-----------------|----------------------|
+| Display (DP/HDMI) | Not submitted | ~12,000 |
+| Audio (HDA + DSP) | Stalled | ~8,000 |
+| USB-C (PD + DP Alt Mode) | Not submitted | ~800 |
+| GPU init sequence | Not submitted | ~1,500 |
+
+**Result:** Mainline Linux 6.19 boots to a serial console with NVMe. That's it.
+
+## What We Provide
+
+Sky1 Linux maintains 55 patches on Linux 6.18.1 LTS plus a complete multimedia stack:
+
+### Kernel & Drivers
+
+| Feature | Status |
+|---------|--------|
+| Display output (4K@60 DP/HDMI) | Working |
+| GPU acceleration (Vulkan/OpenGL ES) | Working via Panthor |
+| Audio (HDA speakers + headphones) | Working |
+| USB-C Power Delivery (up to 100W) | Working |
+| USB-C DisplayPort Alt Mode | Working |
+| WiFi 6 (RTL8852BE) | Working |
+| Dual 5GbE (RTL8126) | Working |
+| PCIe (NVMe, GPU, WiFi) | Working, no kernel params needed |
+
+### Hardware Video (VPU)
+
+The ARM Linlon MVE v8 VPU provides hardware-accelerated video encode/decode. We maintain patched versions of the multimedia stack to enable it:
+
+| Component | What We Added |
+|-----------|---------------|
+| **FFmpeg** | V4L2 M2M support for AV1, VP9, HEVC, H.264 decode/encode |
+| **GStreamer** | v4l2av1dec element for AV1 hardware decode |
+| **libva-v4l2-stateful** | VA-API driver so Firefox/Chromium use hardware decode |
+
+Supported codecs:
+- **Decode:** H.264, HEVC, VP8, VP9, AV1, MPEG-2, MPEG-4
+- **Encode:** H.264, HEVC, VP8, VP9
 
 ## Quick Start
 
@@ -10,10 +54,10 @@ wget -qO- https://sky1-linux.github.io/apt/key.gpg | sudo tee /usr/share/keyring
 echo "deb [signed-by=/usr/share/keyrings/sky1-linux.asc] https://sky1-linux.github.io/apt sid main non-free-firmware" | sudo tee /etc/apt/sources.list.d/sky1-linux.list
 sudo apt update
 
-# Install everything for desktop use
+# Full desktop (includes hardware video support)
 sudo apt install sky1-desktop
 
-# Or minimal (kernel + firmware + 5GbE)
+# Or minimal server
 sudo apt install sky1-minimal
 ```
 
@@ -23,48 +67,53 @@ sudo apt install sky1-minimal
 
 | Repository | Description |
 |------------|-------------|
-| [apt](https://github.com/Sky1-Linux/apt) | APT repository (packages & installation guide) |
-| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18 kernel with Sky1 patches |
+| [apt](https://github.com/Sky1-Linux/apt) | APT repository with installation guide |
+| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.1 LTS with 55 Sky1 patches |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
+| [sky1-drivers-dkms](https://github.com/Sky1-Linux/sky1-drivers-dkms) | 5GbE, VPU, NPU kernel modules |
 
-### Drivers (DKMS)
-
-| Repository | Description |
-|------------|-------------|
-| [sky1-drivers-dkms](https://github.com/Sky1-Linux/sky1-drivers-dkms) | Out-of-tree kernel modules |
-| ↳ r8126 | Realtek RTL8126 5GbE |
-| ↳ vpu | ARM Linlon MVE v8 (video encode/decode) |
-| ↳ npu | ARM Zhouyi V3 (30 TOPS AI accelerator) |
-
-### Multimedia
+### Multimedia (VPU Support)
 
 | Repository | Description |
 |------------|-------------|
-| [ffmpeg-sky1](https://github.com/Sky1-Linux/ffmpeg-sky1) | FFmpeg with V4L2 AV1/VP9 support |
-| [gstreamer-sky1](https://github.com/Sky1-Linux/gstreamer-sky1) | GStreamer with v4l2av1dec |
-| [libva-v4l2-stateful](https://github.com/Sky1-Linux/libva-v4l2-stateful) | VA-API for Firefox/Chromium hardware decode |
+| [ffmpeg-sky1](https://github.com/Sky1-Linux/ffmpeg-sky1) | FFmpeg 8.0 with V4L2 M2M codec patches |
+| [gstreamer-sky1](https://github.com/Sky1-Linux/gstreamer-sky1) | GStreamer with v4l2av1dec element |
+| [libva-v4l2-stateful](https://github.com/Sky1-Linux/libva-v4l2-stateful) | VA-API wrapper for V4L2 stateful decoders |
+
+## Key Kernel Patches
+
+Our patchset includes drivers not available upstream:
+
+- **linlon-dp / trilin-dpsub** — Display processor and DP transmitter
+- **RTS5453** — USB-C PD controller for power negotiation and DP Alt Mode
+- **Panthor power sequence** — Sky1-specific GPU initialization
+- **ARM DMA-350 cyclic mode** — Required for audio streaming
+- **CIX IPBLOQ HDA** — Audio controller driver
+- **PCIe MSI quirk** — Prevents kernel crashes on device enumeration
+- **Shared PHY coordination** — Fixes WiFi + 5GbE race conditions
 
 ## Hardware
 
-| Component | Details |
-|-----------|---------|
-| SoC | CIX CD8180 (Sky1) |
-| CPU | 12-core ARM (4x A720 big + 4x A720 medium + 4x A520 little) |
-| GPU | Mali-G720-Immortalis (Panthor driver) |
-| VPU | ARM Linlon MVE v8, 5 AEU cores |
-| NPU | ARM Zhouyi V3, 30 TOPS |
-| Ethernet | RTL8126 5GbE |
+| Component | Specification |
+|-----------|---------------|
+| **SoC** | CIX CD8180 (Sky1) — ARMv9 |
+| **CPU** | 4x Cortex-A720 + 4x Cortex-A720 + 4x Cortex-A520 |
+| **GPU** | Mali-G720-Immortalis MC10 |
+| **VPU** | ARM Linlon MVE v8 (5 AEU cores) |
+| **NPU** | ARM Zhouyi V3 (30 TOPS) |
+| **Memory** | Up to 64GB LPDDR5 |
+| **Ethernet** | Dual RTL8126 5GbE |
+| **WiFi** | RTL8852BE WiFi 6 + Bluetooth 5.2 |
 
-## Status
+## Project Goals
 
-- Kernel 6.18 LTS with Panthor GPU
-- Hardware video decode: H.264, HEVC, VP8, VP9, AV1
-- Hardware video encode: H.264, HEVC, VP8, VP9
-- WiFi/BT: RTL8852BE supported
-- 5GbE: RTL8126 via DKMS
+1. **Usable today** — Full hardware support on current mainline LTS
+2. **Track upstream** — Rebase as new stable releases come out
+3. **Complete stack** — Kernel, firmware, drivers, and multimedia tools
+4. **Enable upstreaming** — Clean patches that could be submitted
 
 ## License
 
 - Kernel patches: GPL-2.0
-- Firmware: Redistributable (see individual licenses)
-- Userspace tools: Various open source licenses
+- Firmware: Redistributable per vendor terms
+- Userspace packages: Various open source licenses
