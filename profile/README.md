@@ -1,10 +1,10 @@
 # Sky1 Linux
 
-**Making the Radxa Orion O6 actually usable on mainline Linux.**
+**Making CIX Sky1 boards actually usable on mainline Linux.**
 
 ## The Problem
 
-The Radxa Orion O6 packs impressive hardware—a 12-core ARM CPU, Mali-G720 GPU, 30 TOPS NPU, hardware video codec—but mainline Linux doesn't support most of it. CIX Technology is upstreaming basic SoC support (pinctrl, mailbox, PCIe), but critical subsystems have no upstream path:
+CIX Sky1 (CD8180) boards pack impressive hardware—a 12-core ARM CPU, Mali-G720 GPU, 30 TOPS NPU, hardware video codec—but mainline Linux doesn't support most of it. CIX Technology is upstreaming basic SoC support (pinctrl, mailbox, PCIe), but critical subsystems have no upstream path:
 
 | Subsystem | Mainline Status | Lines of Code Missing |
 |-----------|-----------------|----------------------|
@@ -102,8 +102,27 @@ Our patchset includes drivers not available upstream:
 | **VPU** | ARM Linlon MVE v8 (5 AEU cores) |
 | **NPU** | ARM Zhouyi V3 (30 TOPS) |
 | **Memory** | Up to 64GB LPDDR5 |
-| **Ethernet** | Dual RTL8126 5GbE |
-| **WiFi** | RTL8852BE WiFi 6 + Bluetooth 5.2 |
+
+## Supported Boards
+
+Currently tested and supported:
+- **Radxa Orion O6** — Full support
+
+Other Sky1 boards we aim to support:
+- Radxa Orion O6N
+- Minisforum MS-R1
+- OrangePi 6 Plus
+- MetaComputing ARM AI PC
+
+Most of our work is at the SoC level and should work across all Sky1 boards:
+
+| Component | Portability |
+|-----------|-------------|
+| GPU, VPU, NPU, Audio, USB-C PD | Universal (SoC drivers) |
+| Display, PCIe, Ethernet, WiFi | Mostly universal (may need DT tweaks) |
+| GPIO, regulators, board ID | Board-specific (device tree) |
+
+If you have a Sky1 board and want to help add support, contributions are welcome.
 
 ## Project Goals
 
