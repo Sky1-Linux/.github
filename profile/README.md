@@ -17,7 +17,7 @@ CIX Sky1 (CD8180) boards pack impressive hardware—a 12-core ARM CPU, Mali-G720
 
 ## What We Provide
 
-Sky1 Linux maintains 55 patches on Linux 6.18.1 LTS plus a complete multimedia stack:
+Sky1 Linux maintains 57 patches on Linux 6.18.1 LTS plus a complete multimedia stack:
 
 ### Kernel & Drivers
 
@@ -34,13 +34,14 @@ Sky1 Linux maintains 55 patches on Linux 6.18.1 LTS plus a complete multimedia s
 
 ### Hardware Video (VPU)
 
-The ARM Linlon MVE v8 VPU provides hardware-accelerated video encode/decode. We maintain patched versions of the multimedia stack to enable it:
+The ARM Linlon MVE v8 VPU provides hardware-accelerated video encode/decode. We maintain patched applications that use the V4L2 stateful (M2M) API directly:
 
 | Component | What We Added |
 |-----------|---------------|
+| **Firefox** | V4L2-M2M decode for H.264, HEVC, VP9, AV1 |
+| **Chromium** | V4L2-M2M config package (uses unmodified Debian Chromium) |
 | **FFmpeg** | V4L2 M2M support for AV1, VP9, HEVC, H.264 decode/encode |
 | **GStreamer** | v4l2av1dec element for AV1 hardware decode |
-| **libva-v4l2-stateful** | VA-API driver so Firefox/Chromium use hardware decode |
 
 Supported codecs:
 - **Decode:** H.264, HEVC, VP8, VP9, AV1, MPEG-2, MPEG-4
@@ -68,7 +69,7 @@ sudo apt install sky1-minimal
 | Repository | Description |
 |------------|-------------|
 | [apt](https://github.com/Sky1-Linux/apt) | APT repository with installation guide |
-| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.1 LTS with 55 Sky1 patches |
+| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.1 LTS with 57 Sky1 patches |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
 | [sky1-drivers-dkms](https://github.com/Sky1-Linux/sky1-drivers-dkms) | 5GbE, VPU, NPU kernel modules |
 
@@ -76,9 +77,11 @@ sudo apt install sky1-minimal
 
 | Repository | Description |
 |------------|-------------|
+| [firefox-sky1](https://github.com/Sky1-Linux/firefox-sky1) | Firefox with V4L2-M2M hardware decode |
+| [chromium-sky1-config](https://github.com/Sky1-Linux/chromium-sky1-config) | Chromium V4L2-M2M config for Debian package |
 | [ffmpeg-sky1](https://github.com/Sky1-Linux/ffmpeg-sky1) | FFmpeg 8.0 with V4L2 M2M codec patches |
 | [gstreamer-sky1](https://github.com/Sky1-Linux/gstreamer-sky1) | GStreamer with v4l2av1dec element |
-| [libva-v4l2-stateful](https://github.com/Sky1-Linux/libva-v4l2-stateful) | VA-API wrapper for V4L2 stateful decoders |
+| [libva-v4l2-stateful](https://github.com/Sky1-Linux/libva-v4l2-stateful) | VA-API wrapper (deprecated) |
 
 ## Key Kernel Patches
 
