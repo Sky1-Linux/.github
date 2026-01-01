@@ -17,7 +17,7 @@ CIX Sky1 (CD8180) boards pack impressive hardware—a 12-core ARM CPU, Mali-G720
 
 ## What We Provide
 
-Sky1 Linux maintains 57 patches on Linux 6.18.1 LTS plus a complete multimedia stack:
+Sky1 Linux maintains 68 patches on Linux 6.18.2 LTS plus a complete multimedia stack:
 
 ### Kernel & Drivers
 
@@ -69,9 +69,18 @@ sudo apt install sky1-minimal
 | Repository | Description |
 |------------|-------------|
 | [apt](https://github.com/Sky1-Linux/apt) | APT repository with installation guide |
-| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.1 LTS with 57 Sky1 patches |
+| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.2 LTS with 68 Sky1 patches |
+| [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
 | [sky1-drivers-dkms](https://github.com/Sky1-Linux/sky1-drivers-dkms) | 5GbE, VPU, NPU kernel modules |
+| [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts |
+
+### Installer & Live ISO
+
+| Repository | Description |
+|------------|-------------|
+| [sky1-live-build](https://github.com/Sky1-Linux/sky1-live-build) | Live ISO build configuration |
+| [calamares-settings-sky1](https://github.com/Sky1-Linux/calamares-settings-sky1) | Installer branding and config |
 
 ### Multimedia (VPU Support)
 
