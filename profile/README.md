@@ -92,6 +92,14 @@ sudo apt install sky1-minimal
 | [gstreamer-sky1](https://github.com/Sky1-Linux/gstreamer-sky1) | GStreamer with v4l2av1dec element |
 | [libva-v4l2-stateful](https://github.com/Sky1-Linux/libva-v4l2-stateful) | VA-API wrapper (deprecated) |
 
+### Development Tools
+
+| Repository | Description |
+|------------|-------------|
+| [acpi-to-dts-tools](https://github.com/Sky1-Linux/acpi-to-dts-tools) | ACPI to Device Tree conversion tools for board bringup |
+
+**Have an O6N, MS-R1, OrangePi 6 Plus, or other Sky1 board?** Help us add support by running the hardware extraction script in ACPI mode and submitting the results to [acpi-to-dts-tools](https://github.com/Sky1-Linux/acpi-to-dts-tools). This data helps us create device trees for new boards.
+
 ## Key Kernel Patches
 
 Our patchset includes drivers not available upstream:
