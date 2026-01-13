@@ -81,6 +81,7 @@ sudo apt install sky1-minimal
 |------------|-------------|
 | [sky1-live-build](https://github.com/Sky1-Linux/sky1-live-build) | Live ISO build configuration |
 | [calamares-settings-sky1](https://github.com/Sky1-Linux/calamares-settings-sky1) | Installer branding and config |
+| [plasma-setup](https://github.com/Sky1-Linux/plasma-setup) | KDE Plasma first-boot user creation wizard |
 
 ### Multimedia (VPU Support)
 
