@@ -17,7 +17,7 @@ CIX Sky1 (CD8180) boards pack impressive hardware—a 12-core ARM CPU, Mali-G720
 
 ## What We Provide
 
-Sky1 Linux maintains 73 patches on Linux 6.18.7 LTS plus a complete multimedia stack:
+Sky1 Linux maintains 78 patches on Linux 6.18.7 LTS plus a complete multimedia stack:
 
 ### Kernel & Drivers
 
@@ -69,10 +69,9 @@ sudo apt install sky1-minimal
 | Repository | Description |
 |------------|-------------|
 | [apt](https://github.com/Sky1-Linux/apt) | APT repository with installation guide |
-| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.7 LTS with 73 Sky1 patches |
+| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.7 LTS with 78 Sky1 patches |
 | [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
-| [sky1-drivers-dkms](https://github.com/Sky1-Linux/sky1-drivers-dkms) | 5GbE, VPU, NPU kernel modules |
 | [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts |
 
 ### Installer & Live ISO
@@ -112,6 +111,7 @@ Our patchset includes drivers not available upstream:
 - **CIX IPBLOQ HDA** — Audio controller driver
 - **PCIe MSI quirk** — Prevents kernel crashes on device enumeration
 - **Shared PHY coordination** — Fixes WiFi + 5GbE race conditions
+- **In-tree VPU/NPU/Ethernet** — ARM Linlon VPU, Zhouyi NPU, Realtek 5GbE/2.5GbE (no DKMS needed)
 
 ## Hardware
 
