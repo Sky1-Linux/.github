@@ -4,20 +4,43 @@
 
 ## The Problem
 
-CIX Sky1 (CD8180) boards pack impressive hardware—a 12-core ARM CPU, Mali-G720 GPU, 30 TOPS NPU, hardware video codec—but mainline Linux doesn't support most of it. CIX Technology is upstreaming basic SoC support (pinctrl, mailbox, PCIe), but critical subsystems have no upstream path:
+CIX Sky1 (CD8180) boards pack impressive hardware—a 12-core ARM CPU, Mali-G720 GPU, 30 TOPS NPU, hardware video codec—but mainline Linux doesn't support most of it. CIX Technology has begun upstreaming foundational SoC support (pinctrl, mailbox, PCIe, base DTS) in v6.19, but critical subsystems remain out-of-tree:
 
-| Subsystem | Mainline Status | Lines of Code Missing |
-|-----------|-----------------|----------------------|
-| Display (DP/HDMI) | Not submitted | ~12,000 |
-| Audio (HDA + DSP) | Stalled | ~8,000 |
-| USB-C (PD + DP Alt Mode) | Not submitted | ~800 |
-| GPU init sequence | Not submitted | ~1,500 |
+| Subsystem | Mainline v6.19 Status | Our Patches |
+|-----------|----------------------|-------------|
+| Display (DP/HDMI) | Not submitted | ~27,000 lines |
+| Audio (HDA + DSP) | Stalled | ~8,000 lines |
+| USB-C (PD + DP Alt Mode) | Not submitted | ~5,000 lines |
+| GPU init sequence | Not submitted | ~200 lines |
+| NPU (AI accelerator) | Not submitted | ~12,000 lines |
+| VPU (video codec) | Not submitted | ~39,000 lines |
+| Ethernet (5GbE / 2.5GbE) | Not submitted | ~53,000 lines |
 
-**Result:** Mainline Linux 6.19 boots to a serial console with NVMe. That's it.
+**Result:** Unpatched mainline Linux 6.19 boots to a serial console with NVMe and basic PCIe. No display, no audio, no GPU, no networking.
 
 ## What We Provide
 
-Sky1 Linux maintains 78 patches on Linux 6.18.7 LTS plus a complete multimedia stack:
+Sky1 Linux maintains patched kernels across multiple tracks:
+
+| Track | Kernel | Patches | Status |
+|-------|--------|---------|--------|
+| **LTS** | Linux 6.18.7 | 78 patches | Stable, recommended |
+| **RC** | Linux 6.19-rc7 | 12 patches (consolidated) | Testing |
+
+The RC track has fewer patches because they are consolidated by subsystem. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
+
+Users opt into tracks via APT components:
+
+```bash
+# LTS only (default, recommended)
+deb https://sky1-linux.github.io/apt sid main
+
+# LTS + Latest stable
+deb https://sky1-linux.github.io/apt sid main latest
+
+# All tracks including RC testing
+deb https://sky1-linux.github.io/apt sid main latest rc
+```
 
 ### Kernel & Drivers
 
@@ -29,8 +52,10 @@ Sky1 Linux maintains 78 patches on Linux 6.18.7 LTS plus a complete multimedia s
 | USB-C Power Delivery (up to 100W) | Working |
 | USB-C DisplayPort Alt Mode | Working |
 | WiFi 6 (RTL8852BE) | Working |
-| Dual 5GbE (RTL8126) | Working |
+| Dual 5GbE (RTL8126) / 2.5GbE (RTL8125) | Working |
 | PCIe (NVMe, GPU, WiFi) | Working, no kernel params needed |
+| Hardware video decode (H.264/HEVC/AV1/VP9) | Working via VPU |
+| AI accelerator (30 TOPS) | Working via NPU |
 
 ### Hardware Video (VPU)
 
@@ -69,9 +94,10 @@ sudo apt install sky1-minimal
 | Repository | Description |
 |------------|-------------|
 | [apt](https://github.com/Sky1-Linux/apt) | APT repository with installation guide |
-| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Linux 6.18.7 LTS with 78 Sky1 patches |
+| [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Kernel patches, configs, and build metadata (LTS/Latest/RC/Next tracks) |
 | [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
+| [sky1-drivers-dkms](https://github.com/Sky1-Linux/sky1-drivers-dkms) | DKMS drivers (GPU, VPU, NPU) for vendor kernel compatibility |
 | [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts |
 
 ### Installer & Live ISO
@@ -102,16 +128,17 @@ sudo apt install sky1-minimal
 
 ## Key Kernel Patches
 
-Our patchset includes drivers not available upstream:
+Our patchset includes drivers and fixes not available upstream:
 
-- **linlon-dp / trilin-dpsub** — Display processor and DP transmitter
+- **linlon-dp / trilin-dpsub** — Display processor and DP transmitter (4K@60 HDMI/DP)
+- **Panthor power sequence** — Sky1-specific GPU initialization for Mali-G720
+- **CIX IPBLOQ HDA + SOF DSP** — Audio controller and DSP firmware loading
 - **RTS5453** — USB-C PD controller for power negotiation and DP Alt Mode
-- **Panthor power sequence** — Sky1-specific GPU initialization
-- **ARM DMA-350 cyclic mode** — Required for audio streaming
-- **CIX IPBLOQ HDA** — Audio controller driver
-- **PCIe MSI quirk** — Prevents kernel crashes on device enumeration
-- **Shared PHY coordination** — Fixes WiFi + 5GbE race conditions
-- **In-tree VPU/NPU/Ethernet** — ARM Linlon VPU, Zhouyi NPU, Realtek 5GbE/2.5GbE (no DKMS needed)
+- **ARM Linlon VPU** — Hardware video encode/decode (H.264, HEVC, AV1, VP9)
+- **ArmChina Zhouyi NPU** — AI accelerator driver (30 TOPS, 3-core X2_1204MP3)
+- **Realtek RTL8126/RTL8125** — 5GbE and 2.5GbE ethernet (in-tree, no DKMS)
+- **PCIe hotplug fixes** — AER/PME coordination, WiFi scan offload robustness
+- **Bus frequency scaling** — CI700/NI700 interconnect performance management
 
 ## Hardware
 
@@ -148,9 +175,10 @@ If you have a Sky1 board and want to help add support, contributions are welcome
 ## Project Goals
 
 1. **Usable today** — Full hardware support on current mainline LTS
-2. **Track upstream** — Rebase as new stable releases come out
+2. **Track upstream** — Four kernel tracks (LTS, Latest, RC, Next) follow mainline releases
 3. **Complete stack** — Kernel, firmware, drivers, and multimedia tools
-4. **Enable upstreaming** — Clean patches that could be submitted
+4. **Enable upstreaming** — Clean patches organized by subsystem, ready for submission
+5. **Multi-board** — SoC-level support works across all Sky1 boards; only device trees differ
 
 ## License
 
