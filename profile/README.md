@@ -11,7 +11,7 @@ CIX Sky1 (CD8180) boards pack impressive hardware—a 12-core ARM CPU, Mali-G720
 | Display (DP/HDMI) | Not submitted | ~27,000 lines |
 | Audio (HDA + DSP) | Stalled | ~8,000 lines |
 | USB-C (PD + DP Alt Mode) | Not submitted | ~5,000 lines |
-| GPU init sequence | Not submitted | ~200 lines |
+| GPU init + DVFS | Not submitted | ~500 lines |
 | NPU (AI accelerator) | Not submitted | ~12,000 lines |
 | VPU (video codec) | Not submitted | ~39,000 lines |
 | Ethernet (5GbE / 2.5GbE) | Not submitted | ~53,000 lines |
@@ -24,8 +24,8 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.8 | 13 patches | Stable, recommended |
-| **RC** | Linux 6.19-rc7 | 12 patches | Testing |
+| **LTS** | Linux 6.18.8 | 23 patches | Stable, recommended |
+| **RC** | Linux 6.19-rc8 | 23 patches | Testing |
 
 Patches are consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
 
@@ -131,14 +131,15 @@ sudo apt install sky1-minimal
 Our patchset includes drivers and fixes not available upstream:
 
 - **linlon-dp / trilin-dpsub** — Display processor and DP transmitter (4K@60 HDMI/DP)
-- **Panthor power sequence** — Sky1-specific GPU initialization for Mali-G720
+- **Panthor power sequence + DVFS** — Sky1-specific GPU init, SCMI-based frequency/voltage scaling (72–1000 MHz), SCMI rate limiting to prevent transport lockup
 - **CIX IPBLOQ HDA + SOF DSP** — Audio controller and DSP firmware loading
 - **RTS5453** — USB-C PD controller for power negotiation and DP Alt Mode
 - **ARM Linlon VPU** — Hardware video encode/decode (H.264, HEVC, AV1, VP9)
 - **ArmChina Zhouyi NPU** — AI accelerator driver (30 TOPS, 3-core X2_1204MP3)
 - **Realtek RTL8126/RTL8125** — 5GbE and 2.5GbE ethernet (in-tree, no DKMS)
-- **PCIe hotplug fixes** — AER/PME coordination, WiFi scan offload robustness
-- **Bus frequency scaling** — CI700/NI700 interconnect performance management
+- **DRM bridge chain** — Proper DP-to-HDMI bridge for PS185 converter (Orange Pi 6 Plus)
+- **WiFi RFKill** — Corrected GPIO assignment for WLAN radio disable on O6/O6N
+- **GPIO LEDs** — Power, status, and SSD activity LEDs on O6/O6N
 
 ## Kernel Development
 
@@ -162,7 +163,7 @@ All branches carry the same consolidated patch set — one commit per subsystem 
 
 ### Patch consolidation
 
-The patch set was originally developed as 78 granular commits during board bringup. These have been consolidated into 13 subsystem-grouped patches to simplify rebasing and review. The original granular history is preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch.
+The patch set was originally developed as 78 granular commits during board bringup. These have been consolidated into 23 subsystem-grouped patches to simplify rebasing and review. The original granular history is preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch.
 
 ## Hardware
 
@@ -179,11 +180,11 @@ The patch set was originally developed as 78 granular commits during board bring
 
 Currently tested and supported:
 - **Radxa Orion O6** — Full support
+- **Radxa Orion O6N** — Supported
+- **OrangePi 6 Plus** — Initial support
 
 Other Sky1 boards we aim to support:
-- Radxa Orion O6N
 - Minisforum MS-R1
-- OrangePi 6 Plus
 - MetaComputing ARM AI PC
 
 Most of our work is at the SoC level and should work across all Sky1 boards:
