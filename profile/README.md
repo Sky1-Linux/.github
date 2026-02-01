@@ -24,10 +24,10 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.7 | 78 patches | Stable, recommended |
-| **RC** | Linux 6.19-rc7 | 12 patches (consolidated) | Testing |
+| **LTS** | Linux 6.18.8 | 13 patches | Stable, recommended |
+| **RC** | Linux 6.19-rc7 | 12 patches | Testing |
 
-The RC track has fewer patches because they are consolidated by subsystem. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
+Patches are consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
 
 Users opt into tracks via APT components:
 
@@ -139,6 +139,30 @@ Our patchset includes drivers and fixes not available upstream:
 - **Realtek RTL8126/RTL8125** — 5GbE and 2.5GbE ethernet (in-tree, no DKMS)
 - **PCIe hotplug fixes** — AER/PME coordination, WiFi scan offload robustness
 - **Bus frequency scaling** — CI700/NI700 interconnect performance management
+
+## Kernel Development
+
+We maintain the Sky1 patch set across two repositories:
+
+- **[linux](https://github.com/Sky1-Linux/linux)** — Full kernel source with patches applied as commits on top of upstream tags. This is where development happens.
+- **[linux-sky1](https://github.com/Sky1-Linux/linux-sky1)** — Exported patches and kernel configs. This is what the build system and users consume.
+
+### Branching model
+
+Each kernel track is a branch in the `linux` repo, rebased onto its upstream base:
+
+| Branch | Base | Description |
+|--------|------|-------------|
+| `main` | 6.18.x stable | LTS production kernel |
+| `latest` | 6.19.x stable | Latest stable (when available) |
+| `rc` | 6.19-rcN | Release candidate testing |
+| `next` | Linus's master | Bleeding edge |
+
+All branches carry the same consolidated patch set — one commit per subsystem (device trees, PCIe, display, GPU, audio, etc.). When a new upstream tag is released, we rebase the branch forward and re-export patches to `linux-sky1`.
+
+### Patch consolidation
+
+The patch set was originally developed as 78 granular commits during board bringup. These have been consolidated into 13 subsystem-grouped patches to simplify rebasing and review. The original granular history is preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch.
 
 ## Hardware
 
