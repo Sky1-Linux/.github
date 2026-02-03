@@ -24,8 +24,8 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.8 | 23 patches | Stable, recommended |
-| **RC** | Linux 6.19-rc8 | 23 patches | Testing |
+| **LTS** | Linux 6.18.8 | 24 patches | Stable, recommended |
+| **RC** | Linux 6.19-rc8 | 24 patches | Testing |
 
 Patches are consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
 
@@ -163,7 +163,7 @@ All branches carry the same consolidated patch set — one commit per subsystem 
 
 ### Patch consolidation
 
-The patch set was originally developed as 78 granular commits during board bringup. These have been consolidated into 23 subsystem-grouped patches to simplify rebasing and review. The original granular history is preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch.
+The initial board bringup was developed as 78 granular commits, which were squashed into 13 subsystem-grouped patches (DTS, PCIe, USB/PHY, display, GPU, audio, networking, etc.) to simplify rebasing and review. Patches added after that consolidation (bug fixes, new board support, driver improvements) are kept as individual commits. The original pre-consolidation history is preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch.
 
 ## Hardware
 
