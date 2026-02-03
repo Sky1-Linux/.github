@@ -24,8 +24,8 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.8 | 24 patches | Stable, recommended |
-| **RC** | Linux 6.19-rc8 | 24 patches | Testing |
+| **LTS** | Linux 6.18.8 | 28 patches | Stable, recommended |
+| **RC** | Linux 6.19-rc8 | 28 patches | Testing |
 
 Patches are consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
 
@@ -75,17 +75,19 @@ Supported codecs:
 ## Quick Start
 
 ```bash
-# Add repository
+# Add repository (downloads signing key and configures APT source)
 wget -qO- https://sky1-linux.github.io/apt/key.gpg | sudo tee /usr/share/keyrings/sky1-linux.asc > /dev/null
 echo "deb [signed-by=/usr/share/keyrings/sky1-linux.asc] https://sky1-linux.github.io/apt sid main non-free-firmware" | sudo tee /etc/apt/sources.list.d/sky1-linux.list
 sudo apt update
 
-# Full desktop (includes hardware video support)
+# Full desktop (kernel, firmware, hardware video in Firefox/Chromium/FFmpeg/GStreamer)
 sudo apt install sky1-desktop
 
-# Or minimal server
+# Or minimal (kernel + firmware only)
 sudo apt install sky1-minimal
 ```
+
+The `sky1-apt-config` package (pulled in by both meta packages) manages the APT source, signing key, and pin priority — future installs from our ISOs won't need the manual setup above.
 
 ## Repositories
 
@@ -97,7 +99,6 @@ sudo apt install sky1-minimal
 | [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Kernel patches, configs, and build metadata (LTS/Latest/RC/Next tracks) |
 | [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
-| [sky1-drivers-dkms](https://github.com/Sky1-Linux/sky1-drivers-dkms) | DKMS drivers (GPU, VPU, NPU) for vendor kernel compatibility |
 | [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts |
 
 ### Installer & Live ISO
@@ -116,7 +117,6 @@ sudo apt install sky1-minimal
 | [chromium-sky1-config](https://github.com/Sky1-Linux/chromium-sky1-config) | Chromium V4L2-M2M config for Debian package |
 | [ffmpeg-sky1](https://github.com/Sky1-Linux/ffmpeg-sky1) | FFmpeg 8.0 with V4L2 M2M codec patches |
 | [gstreamer-sky1](https://github.com/Sky1-Linux/gstreamer-sky1) | GStreamer with v4l2av1dec element |
-| [libva-v4l2-stateful](https://github.com/Sky1-Linux/libva-v4l2-stateful) | VA-API wrapper (deprecated) |
 
 ### Development Tools
 
@@ -138,6 +138,7 @@ Our patchset includes drivers and fixes not available upstream:
 - **ArmChina Zhouyi NPU** — AI accelerator driver (30 TOPS, 3-core X2_1204MP3)
 - **Realtek RTL8126/RTL8125** — 5GbE and 2.5GbE ethernet (in-tree, no DKMS)
 - **DRM bridge chain** — Proper DP-to-HDMI bridge for PS185 converter (Orange Pi 6 Plus)
+- **PCIe power supply GPIOs** — Corrected NVMe, WiFi, and GBE regulator assignments on O6/O6N
 - **WiFi RFKill** — Corrected GPIO assignment for WLAN radio disable on O6/O6N
 - **GPIO LEDs** — Power, status, and SSD activity LEDs on O6/O6N
 
