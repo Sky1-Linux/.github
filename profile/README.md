@@ -101,11 +101,11 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
 | [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts |
 
-### Installer & Live ISO
+### Images & Installer
 
 | Repository | Description |
 |------------|-------------|
-| [sky1-live-build](https://github.com/Sky1-Linux/sky1-live-build) | Live ISO build configuration |
+| [sky1-image-build](https://github.com/Sky1-Linux/sky1-image-build) | Disk image and live ISO build system |
 | [calamares-settings-sky1](https://github.com/Sky1-Linux/calamares-settings-sky1) | Installer branding and config |
 | [plasma-setup](https://github.com/Sky1-Linux/plasma-setup) | KDE Plasma first-boot user creation wizard |
 
