@@ -124,8 +124,6 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 |------------|-------------|
 | [acpi-to-dts-tools](https://github.com/Sky1-Linux/acpi-to-dts-tools) | ACPI to Device Tree conversion tools for board bringup |
 
-**Have an O6N, MS-R1, OrangePi 6 Plus, or other Sky1 board?** Help us add support by running the hardware extraction script in ACPI mode and submitting the results to [acpi-to-dts-tools](https://github.com/Sky1-Linux/acpi-to-dts-tools). This data helps us create device trees for new boards.
-
 ## Key Kernel Patches
 
 Our patchset includes drivers and fixes not available upstream:
