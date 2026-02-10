@@ -24,8 +24,9 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.8 | 36 patches | Stable, recommended |
-| **RC** | Linux 6.19-rc8 | 36 patches | Testing |
+| **LTS** | Linux 6.18.9 | 108 patches | Stable, recommended |
+| **Latest** | Linux 6.19 | 109 patches | Stable |
+| **RC** | — | — | Dormant (awaiting v7.0-rc1) |
 
 Patches are consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
 
@@ -48,7 +49,7 @@ deb https://sky1-linux.github.io/apt sid main latest rc
 |---------|--------|
 | Display output (4K@60 DP/HDMI) | Working |
 | GPU acceleration (Vulkan/OpenGL ES) | Working via Panthor |
-| Audio (HDA speakers + headphones) | Working |
+| Audio (HDA speakers + headphones + HDMI) | Working |
 | USB-C Power Delivery (up to 100W) | Working |
 | USB-C DisplayPort Alt Mode | Working |
 | WiFi 6 (RTL8852BE) | Working |
@@ -56,6 +57,7 @@ deb https://sky1-linux.github.io/apt sid main latest rc
 | PCIe (NVMe, GPU, WiFi) | Working, no kernel params needed |
 | Hardware video decode (H.264/HEVC/AV1/VP9) | Working via VPU |
 | AI accelerator (30 TOPS) | Working via NPU |
+| ACPI boot | Working (all drivers, both DT and ACPI) |
 
 ### Hardware Video (VPU)
 
@@ -139,6 +141,9 @@ Our patchset includes drivers and fixes not available upstream:
 - **PCIe power supply GPIOs** — Corrected NVMe, WiFi, and GBE regulator assignments on O6/O6N
 - **WiFi RFKill** — Corrected GPIO assignment for WLAN radio disable on O6/O6N
 - **GPIO LEDs** — Power, status, and SSD activity LEDs on O6/O6N
+- **ACPI boot** — Full SCMI/mailbox/clock/reset/power domain support under ACPI firmware, enabling all drivers on both DT and ACPI boot paths
+- **Fan controller** — PWM-based fan speed control and tachometer RPM monitoring
+- **GPT timer** — 64-bit clocksource and clock event device for Sky1
 
 ## Kernel Development
 
@@ -154,8 +159,8 @@ Each kernel track is a branch in the `linux` repo, rebased onto its upstream bas
 | Branch | Base | Description |
 |--------|------|-------------|
 | `main` | 6.18.x stable | LTS production kernel |
-| `latest` | 6.19.x stable | Latest stable (when available) |
-| `rc` | 6.19-rcN | Release candidate testing |
+| `latest` | 6.19.x stable | Latest stable |
+| `rc` | 7.0-rcN | Release candidate testing |
 | `next` | Linus's master | Bleeding edge |
 
 All branches carry the same consolidated patch set — one commit per subsystem (device trees, PCIe, display, GPU, audio, etc.). When a new upstream tag is released, we rebase the branch forward and re-export patches to `linux-sky1`.
