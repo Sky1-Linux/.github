@@ -24,8 +24,8 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.9 | 108 patches | Stable, recommended |
-| **Latest** | Linux 6.19 | 109 patches | Stable |
+| **LTS** | Linux 6.18.x | 114 patches | Stable, recommended |
+| **Latest** | Linux 6.19.x | 114 patches | Stable |
 | **RC** | — | — | Dormant (awaiting v7.0-rc1) |
 
 Patches are consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
@@ -101,7 +101,7 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 | [linux-sky1](https://github.com/Sky1-Linux/linux-sky1) | Kernel patches, configs, and build metadata (LTS/Latest/RC/Next tracks) |
 | [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
-| [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts |
+| [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts and development tools |
 
 ### Images & Installer
 
