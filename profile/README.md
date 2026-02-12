@@ -24,7 +24,7 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.x | 114 patches | Stable, recommended |
+| **LTS** | Linux 6.18.x | 113 patches | Stable, recommended |
 | **Latest** | Linux 6.19.x | 114 patches | Stable |
 | **RC** | — | — | Dormant (awaiting v7.0-rc1) |
 
