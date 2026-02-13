@@ -24,8 +24,8 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.x | 118 patches | Stable, recommended |
-| **Latest** | Linux 6.19.x | 119 patches | Stable |
+| **LTS** | Linux 6.18.x | 117 patches | Stable, recommended |
+| **Latest** | Linux 6.19.x | 118 patches | Stable |
 | **RC** | — | — | Dormant (awaiting v7.0-rc1) |
 
 Early patches were consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
