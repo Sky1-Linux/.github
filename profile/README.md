@@ -24,8 +24,8 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.x | 114 patches | Stable, recommended |
-| **Latest** | Linux 6.19.x | 115 patches | Stable |
+| **LTS** | Linux 6.18.x | 118 patches | Stable, recommended |
+| **Latest** | Linux 6.19.x | 119 patches | Stable |
 | **RC** | — | — | Dormant (awaiting v7.0-rc1) |
 
 Early patches were consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
@@ -131,7 +131,7 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 Our patchset includes drivers and fixes not available upstream:
 
 - **linlon-dp / trilin-dpsub** — Display processor and DP transmitter (4K@60 HDMI/DP)
-- **Panthor power sequence + DVFS** — Sky1-specific GPU init, SCMI-based frequency/voltage scaling (72–1000 MHz), SCMI rate limiting to prevent transport lockup
+- **Panthor GPU init, DVFS + ACE-Lite coherency** — Sky1-specific power sequence, SCMI-based frequency/voltage scaling (72–1000 MHz), ACE-Lite bus coherency enabling GPU L2 write-back caching with SLC visibility for the non-snooping DPU (fixes upstream PROT_BIT register bug)
 - **CIX IPBLOQ HDA + SOF DSP** — Audio controller and DSP firmware loading
 - **RTS5453** — USB-C PD controller for power negotiation and DP Alt Mode
 - **ARM Linlon VPU** — Hardware video encode/decode (H.264, HEVC, AV1, VP9)
