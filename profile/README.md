@@ -27,8 +27,9 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 | **LTS** | Linux 6.18.x | 117 patches | Stable, recommended |
 | **Latest** | Linux 6.19.x | 118 patches | Stable |
 | **RC** | — | — | Dormant (awaiting v7.0-rc1) |
+| **Next** | Linux 7.0 merge window | 22 patches | Active development |
 
-Early patches were consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
+Early patches were consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. The `next` track carries a clean 22-patch series for the 7.0 merge window. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
 
 Users opt into tracks via APT components:
 
@@ -48,7 +49,8 @@ deb https://sky1-linux.github.io/apt sid main latest rc
 | Feature | Status |
 |---------|--------|
 | Display output (4K@60 DP/HDMI) | Working |
-| GPU acceleration (Vulkan/OpenGL ES) | Working via Panthor |
+| GPU acceleration (Vulkan/OpenGL ES) | Working via Panthor + PanVK |
+| GPU compute (Vulkan) | Working — llama.cpp tested at 5.2 t/s |
 | Audio (HDA speakers + headphones + HDMI) | Working |
 | USB-C Power Delivery (up to 100W) | Working |
 | USB-C DisplayPort Alt Mode | Working |
@@ -82,7 +84,7 @@ wget -qO- https://sky1-linux.github.io/apt/key.gpg | sudo tee /usr/share/keyring
 echo "deb [signed-by=/usr/share/keyrings/sky1-linux.asc] https://sky1-linux.github.io/apt sid main non-free-firmware" | sudo tee /etc/apt/sources.list.d/sky1-linux.list
 sudo apt update
 
-# Full desktop (kernel, firmware, hardware video in Firefox/Chromium/FFmpeg/GStreamer)
+# Full desktop (kernel, firmware, Mesa Vulkan, hardware video in Firefox/Chromium/FFmpeg/GStreamer)
 sudo apt install sky1-desktop
 
 # Or minimal (kernel + firmware only)
@@ -102,6 +104,7 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 | [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
 | [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts and development tools |
+| [mesa](https://github.com/Sky1-Linux/mesa) | Mesa 3D with PanVK fixes for Mali-G720 Vulkan compute |
 
 ### Images & Installer
 
@@ -132,6 +135,7 @@ Our patchset includes drivers and fixes not available upstream:
 
 - **linlon-dp / trilin-dpsub** — Display processor and DP transmitter (4K@60 HDMI/DP)
 - **Panthor GPU init, DVFS + ACE-Lite coherency** — Sky1-specific power sequence, SCMI-based frequency/voltage scaling (72–1000 MHz), ACE-Lite bus coherency enabling GPU L2 write-back caching with SLC visibility for the non-snooping DPU (fixes upstream PROT_BIT register bug)
+- **Mesa PanVK fixes** — 40-bit VA space expansion and WLS dispatch serialization fix for GPU compute workloads (TRANSLATION_FAULT in pipelined WLS dispatches on Mali-G720)
 - **CIX IPBLOQ HDA + SOF DSP** — Audio controller and DSP firmware loading
 - **RTS5453** — USB-C PD controller for power negotiation and DP Alt Mode
 - **ARM Linlon VPU** — Hardware video encode/decode (H.264, HEVC, AV1, VP9)
@@ -160,8 +164,8 @@ Each kernel track is a branch in the `linux` repo, rebased onto its upstream bas
 |--------|------|-------------|
 | `main` | 6.18.x stable | LTS production kernel |
 | `latest` | 6.19.x stable | Latest stable |
-| `rc` | 7.0-rcN | Release candidate testing |
-| `next` | Linus's master | Bleeding edge |
+| `rc` | 7.0-rcN | Release candidate testing (dormant) |
+| `next` | 7.0 merge window | Bleeding edge (22 patches) |
 
 All branches carry the same consolidated patch set — one commit per subsystem (device trees, PCIe, display, GPU, audio, etc.). When a new upstream tag is released, we rebase the branch forward and re-export patches to `linux-sky1`.
 
