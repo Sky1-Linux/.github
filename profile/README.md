@@ -49,7 +49,7 @@ deb https://sky1-linux.github.io/apt sid main latest rc
 | Feature | Status |
 |---------|--------|
 | Display output (4K@60 DP/HDMI) | Working |
-| GPU acceleration (Vulkan/OpenGL ES) | Working via Panthor + PanVK |
+| GPU acceleration (Vulkan 1.4 / OpenGL 4.6) | Working — dual-stack: Panthor + PanVK or vendor Mali + Zink |
 | GPU compute (Vulkan) | Working — llama.cpp tested at 5.2 t/s |
 | Audio (HDA speakers + headphones + HDMI) | Working |
 | USB-C Power Delivery (up to 100W) | Working |
@@ -104,7 +104,7 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 | [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
 | [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts and development tools |
-| [mesa](https://github.com/Sky1-Linux/mesa) | Mesa 3D with PanVK fixes for Mali-G720 Vulkan compute |
+| [mesa](https://github.com/Sky1-Linux/mesa) | Mesa 3D with PanVK fixes and Zink GL 4.6 enablement for Mali-G720 |
 
 ### Images & Installer
 
@@ -123,6 +123,23 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 | [ffmpeg-sky1](https://github.com/Sky1-Linux/ffmpeg-sky1) | FFmpeg 8.0 with V4L2 M2M codec patches |
 | [gstreamer-sky1](https://github.com/Sky1-Linux/gstreamer-sky1) | GStreamer with v4l2av1dec element |
 
+### Vendor GPU Stack
+
+The Mali-G720 supports two GPU stacks, selectable at boot via `sky1.gpu=vendor` on the kernel cmdline:
+
+| Stack | Vulkan | OpenGL | Performance | Use Case |
+|-------|--------|--------|-------------|----------|
+| **Open-source** (default) | PanVK (1.4) | Zink (GL 3.2) | Slower (open-source compiler) | General desktop, compute |
+| **Vendor Mali** | Mali (1.4.305) | Zink (GL 4.6) | Full speed (vendor-optimized compiler) | GL apps, gaming, CAD |
+
+Both stacks use Mesa Zink for OpenGL (translating GL to Vulkan). The vendor stack achieves GL 4.6 and significantly higher performance thanks to ARM's optimized shader compiler. A Vulkan WSI layer provides X11 presentation via Xwayland bypass (direct Wayland DMA-BUF) for Zink/GL apps and DRI3 zero-copy for native Vulkan apps. A compatibility layer shims unsupported Vulkan features (fillModeNonSolid, clip/cull distances).
+
+| Repository | Description |
+|------------|-------------|
+| [sky1-gpu-support](https://github.com/Sky1-Linux/sky1-gpu-support) | GPU stack switcher, Mali UMD (r54p1), and Vulkan compat layer |
+| [cix-gpu-kmd](https://github.com/Sky1-Linux/cix-gpu-kmd) | Mali kernel driver (mali_kbase) with DKMS, ported to 6.18–7.0 |
+| [vulkan-wsi-layer](https://github.com/Sky1-Linux/vulkan-wsi-layer) | Vulkan WSI layer with DRI3, Xwayland bypass, and SHM presenters |
+
 ### Development Tools
 
 | Repository | Description |
@@ -135,7 +152,7 @@ Our patchset includes drivers and fixes not available upstream:
 
 - **linlon-dp / trilin-dpsub** — Display processor and DP transmitter (4K@60 HDMI/DP)
 - **Panthor GPU init, DVFS + ACE-Lite coherency** — Sky1-specific power sequence, SCMI-based frequency/voltage scaling (72–1000 MHz), ACE-Lite bus coherency enabling GPU L2 write-back caching with SLC visibility for the non-snooping DPU (fixes upstream PROT_BIT register bug)
-- **Mesa PanVK fixes** — 40-bit VA space expansion and WLS dispatch serialization fix for GPU compute workloads (TRANSLATION_FAULT in pipelined WLS dispatches on Mali-G720)
+- **Mesa PanVK fixes + Zink GL 4.6** — 40-bit VA space expansion, WLS dispatch serialization fix, and Zink feature gate relaxation for full OpenGL 4.6 on Mali-G720
 - **CIX IPBLOQ HDA + SOF DSP** — Audio controller and DSP firmware loading
 - **RTS5453** — USB-C PD controller for power negotiation and DP Alt Mode
 - **ARM Linlon VPU** — Hardware video encode/decode (H.264, HEVC, AV1, VP9)
@@ -216,5 +233,7 @@ If you have a Sky1 board and want to help add support, contributions are welcome
 ## License
 
 - Kernel patches: GPL-2.0
+- Mali kernel driver (mali_kbase): GPL-2.0
+- Mali userspace driver (libmali.so): ARM Mali EULA (redistributable per clause 1.1(ii))
 - Firmware: Redistributable per vendor terms
 - Userspace packages: Various open source licenses
