@@ -24,10 +24,10 @@ Sky1 Linux maintains patched kernels across multiple tracks:
 
 | Track | Kernel | Patches | Status |
 |-------|--------|---------|--------|
-| **LTS** | Linux 6.18.x | 117 patches | Stable, recommended |
-| **Latest** | Linux 6.19.x | 118 patches | Stable |
-| **RC** | — | — | Dormant (awaiting v7.0-rc1) |
-| **Next** | Linux 7.0 merge window | 22 patches | Active development |
+| **LTS** | Linux 6.18.x | 126 patches | Stable, recommended |
+| **Latest** | Linux 6.19.x | 127 patches | Stable |
+| **RC** | Linux 7.0-rc1 | 30 patches | Testing |
+| **Next** | Linux 7.0 development | 30 patches | Active development |
 
 Early patches were consolidated by subsystem — the LTS track was reorganized from the original 78 granular patches (preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch) into 13 subsystem-grouped patches. The `next` track carries a clean 22-patch series for the 7.0 merge window. We fully replace the minimal upstream CIX drivers (PCIe, pinctrl, DTS) with production-quality, board-tested versions and add all subsystems not yet submitted upstream.
 
@@ -104,7 +104,7 @@ The `sky1-apt-config` package (pulled in by both meta packages) manages the APT 
 | [linux](https://github.com/Sky1-Linux/linux) | Full kernel source (mainline + patches) |
 | [sky1-firmware](https://github.com/Sky1-Linux/sky1-firmware) | GPU, DSP, VPU, WiFi firmware |
 | [sky1-linux-build](https://github.com/Sky1-Linux/sky1-linux-build) | Kernel package build scripts and development tools |
-| [mesa](https://github.com/Sky1-Linux/mesa) | Mesa 3D with PanVK fixes and Zink GL 4.6 enablement for Mali-G720 |
+| [mesa-sky1](https://github.com/Sky1-Linux/mesa-sky1) | Mesa 3D with PanVK fixes, Zink GL 4.6, and device-lost recovery for Mali-G720 |
 
 ### Images & Installer
 
@@ -181,14 +181,14 @@ Each kernel track is a branch in the `linux` repo, rebased onto its upstream bas
 |--------|------|-------------|
 | `main` | 6.18.x stable | LTS production kernel |
 | `latest` | 6.19.x stable | Latest stable |
-| `rc` | 7.0-rcN | Release candidate testing (dormant) |
-| `next` | 7.0 merge window | Bleeding edge (22 patches) |
+| `rc` | 7.0-rc1 | Release candidate testing |
+| `next` | 7.0 development | Bleeding edge (30 patches) |
 
 All branches carry the same consolidated patch set — one commit per subsystem (device trees, PCIe, display, GPU, audio, etc.). When a new upstream tag is released, we rebase the branch forward and re-export patches to `linux-sky1`.
 
 ### Patch consolidation
 
-The initial board bringup was developed as 78 granular commits, which were squashed into 13 subsystem-grouped patches (DTS, PCIe, USB/PHY, display, GPU, audio, networking, etc.) to simplify rebasing and review. Patches added after that consolidation (bug fixes, new board support, driver improvements) are kept as individual commits. The original pre-consolidation history is preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch.
+The initial board bringup was developed as 78 granular commits, which were squashed into 13 subsystem-grouped patches (DTS, PCIe, USB/PHY, display, GPU, audio, networking, etc.) to simplify rebasing and review. Patches added after that consolidation (bug fixes, new board support, DP hotplug fixes, driver improvements) are kept as individual commits. The original pre-consolidation history is preserved in the [`original-patches`](https://github.com/Sky1-Linux/linux/tree/original-patches) branch.
 
 ## Hardware
 
